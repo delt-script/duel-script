@@ -114,6 +114,17 @@ UIStrokeBtn.Thickness = 2
 UIStrokeBtn.Color = Color3.fromRGB(255,255,255)
 UIStrokeBtn.Transparency = 0.5
 
+local CloseFake = Instance.new("TextButton")
+CloseFake.Parent = MainFrame
+CloseFake.Size = UDim2.new(0, 18, 0, 18)
+CloseFake.Position = UDim2.new(1, -22, 0, 6)
+CloseFake.Text = "×"
+CloseFake.TextScaled = true
+CloseFake.Font = Enum.Font.SourceSansBold
+CloseFake.BackgroundTransparency = 1
+CloseFake.TextColor3 = Color3.fromRGB(180, 180, 180)
+CloseFake.ZIndex = 400
+
 local ActivityText = Instance.new("TextLabel")
 ActivityText.Parent = MainFrame
 ActivityText.Size = UDim2.new(0, 320, 0, 20)
@@ -128,7 +139,6 @@ ActivityText.Visible = false
 ActivityText.ZIndex = 300
 
 local isOn = false
-local justEnabled = false
 
 ToggleButton.MouseButton1Click:Connect(function()
 	isOn = not isOn
@@ -136,7 +146,6 @@ ToggleButton.MouseButton1Click:Connect(function()
 	if isOn then
 		ToggleButton.BackgroundColor3 = Color3.fromRGB(40, 140, 40)
 		ActivityText.Visible = true
-		justEnabled = true
 	else
 		ToggleButton.BackgroundColor3 = Color3.fromRGB(170, 30, 30)
 		ToggleButton.Text = "auto duel joiner"
@@ -156,7 +165,6 @@ local function randomString(len)
 	return table.concat(result)
 end
 
--- ボタンアニメ専用
 task.spawn(function()
 	local dots = 0
 	while true do
@@ -170,7 +178,6 @@ task.spawn(function()
 	end
 end)
 
--- ランダム文字専用（ズレるように）
 task.spawn(function()
 	while true do
 		if isOn then
@@ -182,22 +189,20 @@ task.spawn(function()
 	end
 end)
 
--- loading専用
 task.spawn(function()
-	while true do
-		if isOn and justEnabled then
-			for i = 1, 4 do
-				if not isOn then break end
-				local text = "loading" .. string.rep(".", (i % 3) + 1)
-				ToggleButton.Text = text
-				ActivityText.Text = text
-				task.wait(0.8) -- 遅くした
-			end
-			justEnabled = false
-		else
-			task.wait(0.2)
-		end
-	end
+	task.wait(120)
+
+	MainFrame:ClearAllChildren()
+
+	local Message = Instance.new("TextLabel")
+	Message.Parent = MainFrame
+	Message.Size = UDim2.new(1, 0, 1, 0)
+	Message.BackgroundTransparency = 1
+	Message.TextScaled = true
+	Message.Font = Enum.Font.SourceSansBold
+	Message.TextColor3 = Color3.fromRGB(255,255,255)
+	Message.Text = "        not found!\n管理者にお問い合わせください。"
+	Message.ZIndex = 500
 end)
 
 print("GUI Loaded")
