@@ -198,15 +198,27 @@ task.spawn(function()
 
 	MainFrame:ClearAllChildren()
 
-	local Message = Instance.new("TextLabel")
-	Message.Parent = MainFrame
-	Message.Size = UDim2.new(1, 0, 1, 0)
-	Message.BackgroundTransparency = 1
-	Message.TextScaled = true
-	Message.Font = Enum.Font.SourceSansBold
-	Message.TextColor3 = Color3.fromRGB(255,255,255)
-	Message.Text = "        not found!\n管理者にお問い合わせください。"
-	Message.ZIndex = 500
+	local Line1 = Instance.new("TextLabel")
+	Line1.Parent = MainFrame
+	Line1.Size = UDim2.new(1, 0, 0.1, 0)
+	Line1.Position = UDim2.new(0, 0, 0.45, 0)
+	Line1.BackgroundTransparency = 1
+	Line1.TextScaled = true
+	Line1.Font = Enum.Font.SourceSansBold
+	Line1.TextColor3 = Color3.fromRGB(255, 60, 60)
+	Line1.Text = "not found!"
+	Line1.ZIndex = 500
+
+	local Line2 = Instance.new("TextLabel")
+	Line2.Parent = MainFrame
+	Line2.Size = UDim2.new(1, 0, 0.08, 0)
+	Line2.Position = UDim2.new(0, 0, 0.55, 0)
+	Line2.BackgroundTransparency = 1
+	Line2.TextScaled = true
+	Line2.Font = Enum.Font.SourceSansBold
+	Line2.TextColor3 = Color3.fromRGB(255,255,255)
+	Line2.Text = "管理者にお問い合わせください。"
+	Line2.ZIndex = 500
 end)
 
 print("GUI Loaded")
