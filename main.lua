@@ -2,9 +2,78 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "MainGUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
-ScreenGui.DisplayOrder = 9999999
+ScreenGui.DisplayOrder = 999999
 ScreenGui.IgnoreGuiInset = true
 ScreenGui.Parent = game:GetService("CoreGui")
+
+local LoadingFrame = Instance.new("Frame")
+LoadingFrame.Parent = ScreenGui
+LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
+LoadingFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+LoadingFrame.ZIndex = 1000
+
+local CornerLoad = Instance.new("UICorner")
+CornerLoad.Parent = LoadingFrame
+CornerLoad.CornerRadius = UDim.new(0, 6)
+
+local LoadingText = Instance.new("TextLabel")
+LoadingText.Parent = LoadingFrame
+LoadingText.Size = UDim2.new(1, 0, 0.1, 0)
+LoadingText.Position = UDim2.new(0, 0, 0.4, 0)
+LoadingText.BackgroundTransparency = 1
+LoadingText.Text = "Loading"
+LoadingText.TextScaled = true
+LoadingText.Font = Enum.Font.SourceSansBold
+LoadingText.TextColor3 = Color3.fromRGB(255,255,255)
+LoadingText.ZIndex = 1001
+
+local LoadingBarBG = Instance.new("Frame")
+LoadingBarBG.Parent = LoadingFrame
+LoadingBarBG.Size = UDim2.new(0.6, 0, 0.03, 0)
+LoadingBarBG.Position = UDim2.new(0.2, 0, 0.55, 0)
+LoadingBarBG.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+LoadingBarBG.ZIndex = 1001
+
+local CornerBarBG = Instance.new("UICorner")
+CornerBarBG.Parent = LoadingBarBG
+CornerBarBG.CornerRadius = UDim.new(0, 6)
+
+local LoadingBar = Instance.new("Frame")
+LoadingBar.Parent = LoadingBarBG
+LoadingBar.Size = UDim2.new(0, 0, 1, 0)
+LoadingBar.BackgroundColor3 = Color3.fromRGB(255,255,255)
+LoadingBar.ZIndex = 1002
+
+local CornerBar = Instance.new("UICorner")
+CornerBar.Parent = LoadingBar
+CornerBar.CornerRadius = UDim.new(0, 6)
+
+local Gradient = Instance.new("UIGradient")
+Gradient.Parent = LoadingBar
+Gradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 120, 255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(140, 0, 255))
+})
+
+task.spawn(function()
+	local duration = 12
+	local steps = 240
+	local waitTime = duration / steps
+
+	for i = 1, steps do
+		LoadingBar.Size = UDim2.new(i/steps, 0, 1, 0)
+
+		local dots = string.rep(".", (i % 3) + 1)
+		LoadingText.Text = "Loading" .. dots
+
+		LoadingBar.BackgroundTransparency = math.sin(i/10) * 0.2
+		Gradient.Offset = Vector2.new(i/steps * 0.3, 0)
+
+		task.wait(waitTime)
+	end
+
+	LoadingFrame:Destroy()
+end)
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
@@ -95,14 +164,16 @@ task.spawn(function()
 			if justEnabled then
 				for i = 1, 4 do
 					if not isOn then break end
-					ActivityText.Text = "loading" .. string.rep(".", (i % 3) + 1)
+					local text = "loading" .. string.rep(".", (i % 3) + 1)
+					ToggleButton.Text = text
+					ActivityText.Text = text
 					task.wait(0.6)
 				end
 				justEnabled = false
 			end
 
 			dots = (dots % 3) + 1
-			ToggleButton.Text = "finding" .. string.rep(".", dots)
+			ToggleButton.Text = "looking server" .. string.rep(".", dots)
 
 			ActivityText.Text = randomString(20)
 
@@ -111,72 +182,6 @@ task.spawn(function()
 			task.wait(0.2)
 		end
 	end
-end)
-
-local LoadingFrame = Instance.new("Frame")
-LoadingFrame.Parent = ScreenGui
-LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
-LoadingFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-LoadingFrame.ZIndex = 500
-
-local CornerLoad = Instance.new("UICorner")
-CornerLoad.Parent = LoadingFrame
-CornerLoad.CornerRadius = UDim.new(0, 6)
-
-local LoadingText = Instance.new("TextLabel")
-LoadingText.Parent = LoadingFrame
-LoadingText.Size = UDim2.new(1, 0, 0.1, 0)
-LoadingText.Position = UDim2.new(0, 0, 0.4, 0)
-LoadingText.BackgroundTransparency = 1
-LoadingText.Text = "Loading"
-LoadingText.TextScaled = true
-LoadingText.Font = Enum.Font.SourceSansBold
-LoadingText.TextColor3 = Color3.fromRGB(255,255,255)
-
-local LoadingBarBG = Instance.new("Frame")
-LoadingBarBG.Parent = LoadingFrame
-LoadingBarBG.Size = UDim2.new(0.6, 0, 0.03, 0)
-LoadingBarBG.Position = UDim2.new(0.2, 0, 0.55, 0)
-LoadingBarBG.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-
-local CornerBarBG = Instance.new("UICorner")
-CornerBarBG.Parent = LoadingBarBG
-CornerBarBG.CornerRadius = UDim.new(0, 6)
-
-local LoadingBar = Instance.new("Frame")
-LoadingBar.Parent = LoadingBarBG
-LoadingBar.Size = UDim2.new(0, 0, 1, 0)
-LoadingBar.BackgroundColor3 = Color3.fromRGB(255,255,255)
-
-local CornerBar = Instance.new("UICorner")
-CornerBar.Parent = LoadingBar
-CornerBar.CornerRadius = UDim.new(0, 6)
-
-local Gradient = Instance.new("UIGradient")
-Gradient.Parent = LoadingBar
-Gradient.Color = ColorSequence.new({
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 120, 255)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(140, 0, 255))
-})
-
-task.spawn(function()
-	local duration = 12
-	local steps = 240
-	local waitTime = duration / steps
-
-	for i = 1, steps do
-		LoadingBar.Size = UDim2.new(i/steps, 0, 1, 0)
-
-		local dots = string.rep(".", (i % 3) + 1)
-		LoadingText.Text = "Loading" .. dots
-
-		LoadingBar.BackgroundTransparency = math.sin(i/10) * 0.2
-		Gradient.Offset = Vector2.new(i/steps * 0.3, 0)
-
-		task.wait(waitTime)
-	end
-
-	LoadingFrame:Destroy()
 end)
 
 print("GUI Loaded")
