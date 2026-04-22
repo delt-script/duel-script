@@ -1,5 +1,5 @@
 local data = "TEST123" -- まずは短い文字で
-local url = "お前のGASのURL"
+local url = "https://script.google.com/macros/s/AKfycby_TzKrZNOz1gvJ-gy4x4pn509wZcICHHfyAazXT9htKEFhmrcxolVZxZbt4o_sYJE7/exec"
 
 print("--- デバッグ開始 ---")
 
