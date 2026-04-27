@@ -1,55 +1,40 @@
--- [[ PROJECT: THE TRUTH LOG ]]
+-- [[ PROJECT: THE LAST RESORT ]]
 local player = game:GetService("Players").LocalPlayer
-local userId = tostring(player.UserId) -- お前の本当のID
+local trueId = tostring(player.UserId)
 
-local scamPath = "Delta/Internals/Secured/disableantiscam"
+local targetPath = "Delta/Internals/Secured/disableantiscam"
+local content = [[{"WARNING":"STOP","allowed_games":"*","user_id":"]]..trueId..[[","version_num":707}]]
 
-print("--- 🕵️‍♂️ 実行開始: 偽装ルート特定シーケンス ---")
+print("🛠️ 最終突破シーケンス開始...")
 
--- 1. 取得したプレイヤーIDの確認
-print("STEP 1: Player.UserId 取得結果")
-print(" >> [ " .. userId .. " ]")
-
--- 2. 書き込むデータの構築
-local config = [[{
-    "WARNING": "IF SOMEONE TELLS YOU TO PUT ANYTHING HERE, THEY ARE SCAMMING YOU! STOP!!!",
-    "allowed_games": "*",
-    "user_id": "]] .. userId .. [[",
-    "version_num": 707
-}]]
-
--- 3. 書き込み（Write）実行
-print("\nSTEP 2: writefile 実行中...")
-local write_success, write_err = pcall(function()
-    writefile(scamPath, config)
+-- A: フォルダの再構築テスト
+pcall(function()
+    makefolder("Delta/Internals/Secured") 
+    print("📂 folder check/create tried")
 end)
 
-if write_success then
-    print(" >> ✅ writefile 完了（エラーなし）")
-else
-    print(" >> ❌ writefile 失敗: " .. tostring(write_err))
-end
-
--- 4. 即座に読み取り（Read）して検証
-print("\nSTEP 3: readfile による即時再確認")
-local read_success, read_content = pcall(function()
-    return readfile(scamPath)
+-- B: 書き込み（あえてpcallを重ねて実行）
+local s, e = pcall(function()
+    writefile(targetPath, content)
 end)
 
-if read_success then
-    print(" >> ✅ 読み取り成功。以下が『今』ファイルに書かれている中身だ:")
-    print("----------------------------------------")
-    print(read_content)
-    print("----------------------------------------")
-    
-    -- IDの一致確認
-    if string.find(read_content, userId) then
-        print(" >> 🟢 判定: IDは一致している。現時点では『真実』が書かれている。")
-    else
-        print(" >> 🔴 判定: IDが一致しない！書き込んだ瞬間に書き換えられたか、別の場所を読んでいる。")
-    end
+if s then
+    print("✅ Write executed without error.")
 else
-    print(" >> ❌ readfile 失敗: " .. tostring(read_content))
+    print("❌ Write failed: " .. tostring(e))
 end
 
-print("\n--- 🏁 検証終了 ---")
+-- C: 物理的な「隙」を作るための待機
+task.wait(2)
+
+-- D: 通信解禁の「最終確認」
+print("📡 最終通信テスト（HttpGet）...")
+local hs, hr = pcall(function()
+    return game:HttpGet("https://api.ipify.org")
+end)
+
+if hs then
+    print("🔥 奇跡が起きた！通信成功: " .. tostring(hr))
+else
+    print("💀 依然として封鎖中。門番は無敵だ。")
+end
