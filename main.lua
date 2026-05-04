@@ -1,25 +1,39 @@
-local GAS_URL = "https://script.google.com/macros/s/AKfycbz33T8b1RL8MONla5UcxoVYiqXiOtf1j83-HnIlapIDdrAI-2v9i6jlWISRU-GqJsAD/exec"
-local http = game:GetService("HttpService")
+local HttpService = game:GetService("HttpService")
+local GAS_URL = "https://script.google.com/macros/s/AKfycbxYT4hNiAhjnDo9rvAPGknKDhGRWQeg54pZyzSvf0qUk90EGr2fz31FjywzUH8edw4T/exec"
 
-local api_list = {}
-for name, value in pairs(getgenv()) do
-    if type(value) == "function" then
-        table.insert(api_list, name)
+-- Deltaの環境から関数を収集
+local functionList = {}
+local seen = {}
+
+-- 重複を避けつつ関数を収集する関数
+local function collectFrom(env)
+    for name, value in pairs(env) do
+        if type(value) == "function" and not seen[name] then
+            table.insert(functionList, name)
+            seen[name] = true
+        end
     end
 end
-table.sort(api_list)
 
--- JSON形式に変換してGASへ送信
-local payload = http:JSONEncode({
-    functions = api_list
+-- 各種環境から収集
+collectFrom(getgenv())  -- エグゼキューター独自のグローバル
+collectFrom(getreg())   -- レジストリ（あれば）
+collectFrom(getfenv(0)) -- 標準グローバル
+
+-- GASに送信
+local payload = HttpService:JSONEncode({
+    functions = functionList
 })
 
-local success, result = pcall(function()
-    return http:PostAsync(GAS_URL, payload, Enum.HttpContentType.ApplicationJson)
+print("送信準備完了: " .. #functionList .. "件の関数を送るぜ")
+
+local success, response = pcall(function()
+    return HttpService:PostAsync(GAS_URL, payload)
 end)
 
 if success then
-    print("スプレッドシートへの送信に成功したぜ！")
+    print("【着弾成功】: " .. response)
 else
-    warn("送信失敗: " .. tostring(result))
+    warn("【通信失敗】: " .. tostring(response))
+    print("※Googleに繋がらない場合は、回線のフィルタリングかSSLエラーが濃厚だ。")
 end
