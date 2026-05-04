@@ -1,5 +1,5 @@
 local HttpService = game:GetService("HttpService")
-local GAS_URL = "https://script.google.com/macros/s/AKfycbxYT4hNiAhjnDo9rvAPGknKDhGRWQeg54pZyzSvf0qUk90EGr2fz31FjywzUH8edw4T/exec"
+local GAS_URL = "https://script.google.com/macros/s/AKfycbyeHXL7T7sIu4a28URoUzEmjBtV2namGFPIsJjy-CwPKSD7DL2oE7I7VqH0wJRxPpry/exec"
 
 -- Deltaの環境から関数を収集
 local functionList = {}
